@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인공지능 바둑 승리 원리 퀴즈</title>
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #111111;
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            font-size: 18px;
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #000000;
+        }
+        .subtitle {
+            text-align: center;
+            color: #555555;
+            font-size: 18px;
+            margin-bottom: 50px;
+        }
+        .quiz-item {
+            background-color: #ffffff;
+            border: 2px solid #111111;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 4px 4px 0px #111111;
+        }
+        .question {
+            font-weight: bold;
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #000000;
+        }
+        .options {
+            list-style-type: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+        }
+        .option-item {
+            margin-bottom: 14px;
+        }
+        .option-label {
+            display: block;
+            padding: 14px 18px;
+            border: 1px solid #333333;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s, border 0.2s;
+            font-size: 18px;
+        }
+        .option-label:hover {
+            background-color: #f5f5f5;
+        }
+        input[type="radio"] {
+            margin-right: 12px;
+            transform: scale(1.4);
+            vertical-align: middle;
+        }
+        .btn-check {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #111111;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-check:hover {
+            background-color: #444444;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 6px;
+            display: none;
+            border: 2px solid #111111;
+        }
+        .result.correct {
+            background-color: #e8f5e9;
+            color: #1b5e20;
+            border-color: #2e7d32;
+        }
+        .result.incorrect {
+            background-color: #ffebee;
+            color: #b71c1c;
+            border-color: #c62828;
+        }
+        .result-title {
+            font-weight: bold;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        .explanation {
+            font-size: 17px;
+            color: #333333;
+            font-weight: normal;
+            line-height: 1.5;
+        }
+        .score-container {
+            text-align: center;
+            margin-top: 60px;
+            padding: 40px;
+            border: 3px dashed #111111;
+            border-radius: 10px;
+            background-color: #fafafa;
+        }
+        .btn-total {
+            padding: 16px 36px;
+            font-size: 22px;
+            background-color: #000000;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 3px 3px 0px #555555;
+        }
+        .btn-total:hover {
+            background-color: #222222;
+        }
+        #total-score {
+            font-size: 26px;
+            margin-top: 25px;
+            font-weight: bold;
+            color: #000000;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>인공지능 바둑 승리 원리 퀴즈</h1>
+    <div class="subtitle">수업 내용을 잘 이해했는지 스스로 확인해 봅시다!</div>
+
+    <!-- Q1 -->
+    <div class="quiz-item" id="q1">
+        <div class="question">1. 과거의 컴퓨터가 체스나 오목과 달리, 바둑에서 오랫동안 인간을 이기지 못한 가장 큰 이유는 무엇일까요?</div>
+        <ul class="options">
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz1" value="1"> ① 바둑판이 너무 넓어서 컴퓨터 화면에 다 들어가지 않기 때문에</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz1" value="2"> ② 바둑에 담긴 동양 철학을 컴퓨터가 이해할 수 없기 때문에</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz1" value="3"> ③ 바둑의 경우의 수가 우주의 별 수보다 많아 모든 수를 미리 외울 수 없기 때문에</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz1" value="4"> ④ 바둑 규칙이 체스보다 훨씬 복잡하고 자주 바뀌기 때문에</label>
+            </li>
+        </ul>
+        <button class="btn-check" onclick="checkAnswer(1, 3)">정답 확인</button>
+        <div class="result" id="result1">
+            <div class="result-title"></div>
+            <div class="explanation">해설: 바둑은 돌을 놓을 수 있는 경우의 수가 무한에 가까울 정도로 많아, 옛날 컴퓨터처럼 '모든 정답을 다 외우는' 방식으로는 접근이 불가능했습니다.</div>
+        </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-item" id="q2">
+        <div class="question">2. 과학자들이 컴퓨터에게 정답을 외우게 하는 대신, 사람의 뇌처럼 '스스로 생각하고 학습하는 능력'을 부여한 기술을 무엇이라고 부르나요?</div>
+        <ul class="options">
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz2" value="1"> ① 블록체인 (Blockchain)</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz2" value="2"> ② 딥러닝 (Deep Learning)</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz2" value="3"> ③ 메타버스 (Metaverse)</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz2" value="4"> ④ 클라우드 컴퓨팅 (Cloud Computing)</label>
+            </li>
+        </ul>
+        <button class="btn-check" onclick="checkAnswer(2, 2)">정답 확인</button>
+        <div class="result" id="result2">
+            <div class="result-title"></div>
+            <div class="explanation">해설: 인간의 신경망을 모방하여 컴퓨터가 스스로 패턴을 찾고 깊게(Deep) 배우는(Learning) 핵심 기술입니다.</div>
+        </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-item" id="q3">
+        <div class="question">3. 인공지능이 과거 프로 바둑 기사들이 두었던 수십만 판의 바둑 기록(기보)을 보고 공부하는 과정은 어떤 행동과 가장 비슷할까요?</div>
+        <ul class="options">
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz3" value="1"> ① 운동선수가 매일 혼자서 팔굽혀펴기를 하는 것</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz3" value="2"> ② 요리사가 새로운 레시피를 완전히 처음부터 창작하는 것</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz3" value="3"> ③ 미술 학생이 유명 화가의 멋진 그림들을 보며 따라 그려보는 것</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz3" value="4"> ① 시험 전날 교과서를 보지 않고 운으로 정답을 찍는 것</label>
+            </li>
+        </ul>
+        <button class="btn-check" onclick="checkAnswer(3, 3)">정답 확인</button>
+        <div class="result" id="result3">
+            <div class="result-title"></div>
+            <div class="explanation">해설: 인간 고수들의 좋은 수를 보고 모방하며 감각을 익히는 데이터 학습 과정과 매우 유사합니다.</div>
+        </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-item" id="q4">
+        <div class="question">4. 인공지능이 자기 자신과 수백만 판의 대결을 하면서, 이기면 상을 받고 지면 벌을 받으며 스스로 실력을 키우는 훈련 방법의 이름은 무엇인가요?</div>
+        <ul class="options">
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz4" value="1"> ① 강화학습 (Reinforcement Learning)</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz4" value="2"> ② 기억학습 (Memory Learning)</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz4" value="3"> ③ 주입식 교육 (Cramming Method)</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz4" value="4"> ④ 가상현실 (Virtual Reality)</label>
+            </li>
+        </ul>
+        <button class="btn-check" onclick="checkAnswer(4, 1)">정답 확인</button>
+        <div class="result" id="result4">
+            <div class="result-title"></div>
+            <div class="explanation">해설: 어떤 환경에서 보상(상)을 최대화하는 행동을 스스로 시행착오를 겪으며 찾아내는 학습 방식입니다.</div>
+        </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="quiz-item" id="q5">
+        <div class="question">5. 수업 시간에 '강화학습'의 원리를 설명하기 위해 사용한 비유로 가장 알맞은 것은 무엇이었나요?</div>
+        <ul class="options">
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz5" value="1"> ① 수학 공식을 백 번 쓰면서 외우는 것</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz5" value="2"> ② 처음 자전거를 탈 때 넘어지면서 중심 잡는 법을 몸으로 깨우치는 것</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz5" value="3"> ③ 퍼즐 조각을 색깔별로 예쁘게 분류하는 것</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz5" value="4"> ④ 선생님의 설명을 듣고 필기를 꼼꼼히 하는 것</label>
+            </li>
+        </ul>
+        <button class="btn-check" onclick="checkAnswer(5, 2)">정답 확인</button>
+        <div class="result" id="result5">
+            <div class="result-title"></div>
+            <div class="explanation">해설: 실패(넘어짐)와 성공(나아감)을 반복하며 스스로 요령을 터득하는 자전거 연습 과정이 강화학습과 똑같습니다.</div>
+        </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="quiz-item" id="q6">
+        <div class="question">6. 바둑을 둘 때 모든 경우를 다 계산하면 시간이 너무 오래 걸립니다. 그래서 인공지능은 이길 확률이 가장 높은 몇 가지 길만 골라서 앞을 내다보는데, 이 똑똑한 찍기 기술을 무엇이라고 하나요?</div>
+        <ul class="options">
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz6" value="1"> ① 내비게이션 시스템</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz6" value="2"> ② 몬테카를로 트리 탐색</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz6" value="3"> ③ 알고리즘 정렬</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz6" value="4"> ④ 홀로그램 렌즈</label>
+            </li>
+        </ul>
+        <button class="btn-check" onclick="checkAnswer(6, 2)">정답 확인</button>
+        <div class="result" id="result6">
+            <div class="result-title"></div>
+            <div class="explanation">해설: 승률을 계산하여 가장 가능성 높은 경로(트리의 가지)를 집중적으로 파고드는 효율적인 탐색 방법입니다.</div>
+        </div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="quiz-item" id="q7">
+        <div class="question">7. 다음 중 인공지능이 인간을 바둑에서 이기기 위해 사용한 '세 가지 핵심 비법'에 포함되지 않는 것은 무엇인가요?</div>
+        <ul class="options">
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz7" value="1"> ① 사람의 뇌처럼 스스로 학습하기 (딥러닝)</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz7" value="2"> ② 상과 벌을 통해 스스로 훈련하기 (강화학습)</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz7" value="3"> ③ 확률이 높은 길만 골라서 탐색하기 (몬테카를로 트리 탐색)</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz7" value="4"> ④ 세상의 모든 바둑 규칙을 매일 새롭게 바꾸기</label>
+            </li>
+        </ul>
+        <button class="btn-check" onclick="checkAnswer(7, 4)">정답 확인</button>
+        <div class="result" id="result7">
+            <div class="result-title"></div>
+            <div class="explanation">해설: 인공지능은 정해진 바둑 규칙 틀 안에서 최고의 효율을 찾아내는 것이지, 규칙 자체를 바꾸지 않습니다.</div>
+        </div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="quiz-item" id="q8">
+        <div class="question">8. 과거의 컴퓨터와 인공지능(알파고)이 바둑을 대하는 방식의 차이점을 가장 바르게 설명한 학생은 누구인가요?</div>
+        <ul class="options">
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz8" value="1"> ① 지민: 과거 컴퓨터는 스스로 학습했고, 인공지능은 사람이 일일이 조종했어.</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz8" value="2"> ② 현우: 과거 컴퓨터는 모든 정답을 외우려고 했지만, 인공지능은 원리를 깨우치고 스스로 학습했어.</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz8" value="3"> ③ 수진: 과거 컴퓨터는 전기를 많이 썼고, 인공지능은 건전지만으로 움직여.</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz8" value="4"> ④ 민재: 사실 둘 다 완전히 똑같은 방식을 썼는데 속도만 달라진 거야.</label>
+            </li>
+        </ul>
+        <button class="btn-check" onclick="checkAnswer(8, 2)">정답 확인</button>
+        <div class="result" id="result8">
+            <div class="result-title"></div>
+            <div class="explanation">해설: 단순 암기형 계산 방식의 한계를 딥러닝과 강화학습이라는 '스스로 깨우치는 방식'으로 극복한 것이 핵심 차이점입니다.</div>
+        </div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="quiz-item" id="q9">
+        <div class="question">9. 인공지능이 두는 '수'가 때로는 프로 기사들도 이해하지 못할 만큼 엉뚱해 보였지만, 결국 승리하게 만든 이유는 무엇일까요?</div>
+        <ul class="options">
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz9" value="1"> ① 컴퓨터가 오류를 일으켜서 무작위로 돌을 놓았기 때문에</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz9" value="2"> ② 인간이 아직 발견하지 못한 새롭고 승률이 높은 길을 찾아냈기 때문에</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz9" value="3"> ③ 상대방을 화나게 만들어서 실수를 유도하기 위해 일부러 장난을 쳤기 때문에</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz9" value="4"> ④ 바둑판의 줄 개수를 컴퓨터 마음대로 줄여서 계산했기 때문에</label>
+            </li>
+        </ul>
+        <button class="btn-check" onclick="checkAnswer(9, 2)">정답 확인</button>
+        <div class="result" id="result9">
+            <div class="result-title"></div>
+            <div class="explanation">해설: 사람의 고정관념이나 관습에 얽매이지 않고, 수많은 시뮬레이션을 통해 오직 '이길 확률'이 가장 높은 새로운 길을 계산해 낸 결과입니다.</div>
+        </div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="quiz-item" id="q10">
+        <div class="question">10. 오늘 배운 내용을 종합해 볼 때, 인공지능에 대한 설명으로 알맞은 것은?</div>
+        <ul class="options">
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz10" value="1"> ① 인공지능은 처음부터 모든 정답을 머릿속에 저장하고 태어난다.</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz10" value="2"> ② 인공지능이 똑똑해지기 위해서는 방대한 데이터와 스스로 학습하는 훈련 과정이 필요하다.</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz10" value="3"> ③ 인공지능은 무조건 사람의 지시가 있을 때만 움직이며 스스로 발전할 수 없다.</label>
+            </li>
+            <li class="option-item">
+                <label class="option-label"><input type="radio" name="quiz10" value="4"> ④ 앞으로 인공지능은 오직 바둑이나 체스 같은 게임에서만 활용될 것이다.</label>
+            </li>
+        </ul>
+        <button class="btn-check" onclick="checkAnswer(10, 2)">정답 확인</button>
+        <div class="result" id="result10">
+            <div class="result-title"></div>
+            <div class="explanation">해설: 인공지능은 데이터(기보)를 통한 학습과 수많은 실전 연습(강화학습)을 거치며 점진적으로 발전합니다.</div>
+        </div>
+    </div>
+
+    <!-- 총점 계산 -->
+    <div class="score-container">
+        <button class="btn-total" onclick="calculateTotalScore()">내 점수 확인하기</button>
+        <div id="total-score"></div>
+    </div>
+</div>
+
+<script>
+    const userAnswers = {};
+    const totalQuestions = 10;
+
+    function checkAnswer(qNum, correctVal) {
+        const selected = document.querySelector(`input[name="quiz${qNum}"]:checked`);
+        const resultDiv = document.getElementById(`result${qNum}`);
+        const titleDiv = resultDiv.querySelector('.result-title');
+
+        if (!selected) {
+            alert("답을 먼저 선택해 주세요!");
+            return;
+        }
+
+        const userVal = parseInt(selected.value);
+        userAnswers[qNum] = userVal;
+
+        resultDiv.style.display = "block";
+        
+        if (userVal === correctVal) {
+            resultDiv.className = "result correct";
+            titleDiv.innerText = "⭕ 정답입니다!";
+        } else {
+            resultDiv.className = "result incorrect";
+            titleDiv.innerText = `❌ 틀렸습니다! (정답: ${correctVal}번)`;
+        }
+    }
+
+    function calculateTotalScore() {
+        let correctCount = 0;
+        const answers = { 1:3, 2:2, 3:3, 4:1, 5:2, 6:2, 7:4, 8:2, 9:2, 10:2 };
+
+        for (let i = 1; i <= totalQuestions; i++) {
+            if (userAnswers[i] === answers[i]) {
+                correctCount++;
+            }
+        }
+
+        const scoreDiv = document.getElementById('total-score');
+        scoreDiv.style.display = "block";
+        scoreDiv.innerHTML = `맞힌 개수: ${correctCount} / ${totalQuestions} <br> <span style="font-size: 20px; color: #555555;">(총점: ${correctCount * 10}점)</span>`;
+        
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+</script>
+
+</body>
+</html>

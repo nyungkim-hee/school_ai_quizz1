@@ -3,447 +3,1655 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>인공지능 바둑 승리 원리 퀴즈</title>
+    <title>집단상담 만족도 조사 및 통계 시스템</title>
+    <!-- Tailwind CSS for elegant responsive design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for professional modern icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for beautiful analytics visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Sans/Inter style font selection -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        excel: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    },
+                    boxShadow: {
+                        'premium': '0 10px 30px -10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02)',
+                        'excel': '0 4px 20px -2px rgba(22, 163, 74, 0.08)'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body {
-            background-color: #ffffff;
-            color: #111111;
-            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
-            font-size: 18px;
-            line-height: 1.6;
-            margin: 0;
-            padding: 40px 20px;
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
         }
-        h1 {
-            font-size: 32px;
-            text-align: center;
-            margin-bottom: 10px;
-            color: #000000;
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
         }
-        .subtitle {
-            text-align: center;
-            color: #555555;
-            font-size: 18px;
-            margin-bottom: 50px;
-        }
-        .quiz-item {
-            background-color: #ffffff;
-            border: 2px solid #111111;
-            border-radius: 10px;
-            padding: 30px;
-            margin-bottom: 40px;
-            box-shadow: 4px 4px 0px #111111;
-        }
-        .question {
-            font-weight: bold;
-            font-size: 22px;
-            margin-bottom: 20px;
-            color: #000000;
-        }
-        .options {
-            list-style-type: none;
-            padding: 0;
-            margin: 0 0 20px 0;
-        }
-        .option-item {
-            margin-bottom: 14px;
-        }
-        .option-label {
-            display: block;
-            padding: 14px 18px;
-            border: 1px solid #333333;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s, border 0.2s;
-            font-size: 18px;
-        }
-        .option-label:hover {
-            background-color: #f5f5f5;
-        }
-        input[type="radio"] {
-            margin-right: 12px;
-            transform: scale(1.4);
-            vertical-align: middle;
-        }
-        .btn-check {
-            display: inline-block;
-            padding: 12px 24px;
-            background-color: #111111;
-            color: #ffffff;
-            border: none;
-            border-radius: 6px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .btn-check:hover {
-            background-color: #444444;
-        }
-        .result {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 6px;
-            display: none;
-            border: 2px solid #111111;
-        }
-        .result.correct {
-            background-color: #e8f5e9;
-            color: #1b5e20;
-            border-color: #2e7d32;
-        }
-        .result.incorrect {
-            background-color: #ffebee;
-            color: #b71c1c;
-            border-color: #c62828;
-        }
-        .result-title {
-            font-weight: bold;
-            font-size: 20px;
-            margin-bottom: 8px;
-        }
-        .explanation {
-            font-size: 17px;
-            color: #333333;
-            font-weight: normal;
-            line-height: 1.5;
-        }
-        .score-container {
-            text-align: center;
-            margin-top: 60px;
-            padding: 40px;
-            border: 3px dashed #111111;
-            border-radius: 10px;
-            background-color: #fafafa;
-        }
-        .btn-total {
-            padding: 16px 36px;
-            font-size: 22px;
-            background-color: #000000;
-            color: #ffffff;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 3px 3px 0px #555555;
-        }
-        .btn-total:hover {
-            background-color: #222222;
-        }
-        #total-score {
-            font-size: 26px;
-            margin-top: 25px;
-            font-weight: bold;
-            color: #000000;
-            display: none;
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
 </head>
-<body>
+<body class="bg-slate-50/70 text-slate-800 min-h-screen flex flex-col font-sans selection:bg-brand-100 selection:text-brand-700">
 
-<div class="container">
-    <h1>인공지능 바둑 승리 원리 퀴즈</h1>
-    <div class="subtitle">수업 내용을 잘 이해했는지 스스로 확인해 봅시다!</div>
-
-    <!-- Q1 -->
-    <div class="quiz-item" id="q1">
-        <div class="question">1. 과거의 컴퓨터가 체스나 오목과 달리, 바둑에서 오랫동안 인간을 이기지 못한 가장 큰 이유는 무엇일까요?</div>
-        <ul class="options">
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz1" value="1"> ① 바둑판이 너무 넓어서 컴퓨터 화면에 다 들어가지 않기 때문에</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz1" value="2"> ② 바둑에 담긴 동양 철학을 컴퓨터가 이해할 수 없기 때문에</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz1" value="3"> ③ 바둑의 경우의 수가 우주의 별 수보다 많아 모든 수를 미리 외울 수 없기 때문에</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz1" value="4"> ④ 바둑 규칙이 체스보다 훨씬 복잡하고 자주 바뀌기 때문에</label>
-            </li>
-        </ul>
-        <button class="btn-check" onclick="checkAnswer(1, 3)">정답 확인</button>
-        <div class="result" id="result1">
-            <div class="result-title"></div>
-            <div class="explanation">해설: 바둑은 돌을 놓을 수 있는 경우의 수가 무한에 가까울 정도로 많아, 옛날 컴퓨터처럼 '모든 정답을 다 외우는' 방식으로는 접근이 불가능했습니다.</div>
+    <!-- Global Header -->
+    <header class="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm backdrop-blur-md bg-white/90">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-md shadow-emerald-200">
+                    <i class="fa-solid fa-file-excel text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-slate-800 text-sm sm:text-base tracking-tight">집단상담 만족도 조사 및 통계 시스템</h1>
+                    <p class="text-[11px] text-slate-400 font-medium">연계 파일: <span class="text-emerald-600 font-semibold">집단상담 통계표.xlsx</span></p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <div id="connection-badge" class="hidden sm:inline-block">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">
+                        <i class="fa-solid fa-circle-nodes mr-1 text-[8px] animate-pulse"></i> 오프라인 연동중
+                    </span>
+                </div>
+                <!-- Role Selector -->
+                <div class="bg-slate-100 p-1 rounded-xl flex">
+                    <button id="btn-role-student" onclick="switchRole('student')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition duration-200 bg-white text-slate-800 shadow-xs">
+                        <i class="fa-solid fa-user-graduate mr-1"></i>학생용 설문
+                    </button>
+                    <button id="btn-role-teacher" onclick="switchRole('teacher')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition duration-200 text-slate-500 hover:text-slate-800">
+                        <i class="fa-solid fa-user-tie mr-1"></i>교사용 통계
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
+    </header>
 
-    <!-- Q2 -->
-    <div class="quiz-item" id="q2">
-        <div class="question">2. 과학자들이 컴퓨터에게 정답을 외우게 하는 대신, 사람의 뇌처럼 '스스로 생각하고 학습하는 능력'을 부여한 기술을 무엇이라고 부르나요?</div>
-        <ul class="options">
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz2" value="1"> ① 블록체인 (Blockchain)</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz2" value="2"> ② 딥러닝 (Deep Learning)</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz2" value="3"> ③ 메타버스 (Metaverse)</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz2" value="4"> ④ 클라우드 컴퓨팅 (Cloud Computing)</label>
-            </li>
-        </ul>
-        <button class="btn-check" onclick="checkAnswer(2, 2)">정답 확인</button>
-        <div class="result" id="result2">
-            <div class="result-title"></div>
-            <div class="explanation">해설: 인간의 신경망을 모방하여 컴퓨터가 스스로 패턴을 찾고 깊게(Deep) 배우는(Learning) 핵심 기술입니다.</div>
-        </div>
-    </div>
-
-    <!-- Q3 -->
-    <div class="quiz-item" id="q3">
-        <div class="question">3. 인공지능이 과거 프로 바둑 기사들이 두었던 수십만 판의 바둑 기록(기보)을 보고 공부하는 과정은 어떤 행동과 가장 비슷할까요?</div>
-        <ul class="options">
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz3" value="1"> ① 운동선수가 매일 혼자서 팔굽혀펴기를 하는 것</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz3" value="2"> ② 요리사가 새로운 레시피를 완전히 처음부터 창작하는 것</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz3" value="3"> ③ 미술 학생이 유명 화가의 멋진 그림들을 보며 따라 그려보는 것</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz3" value="4"> ① 시험 전날 교과서를 보지 않고 운으로 정답을 찍는 것</label>
-            </li>
-        </ul>
-        <button class="btn-check" onclick="checkAnswer(3, 3)">정답 확인</button>
-        <div class="result" id="result3">
-            <div class="result-title"></div>
-            <div class="explanation">해설: 인간 고수들의 좋은 수를 보고 모방하며 감각을 익히는 데이터 학습 과정과 매우 유사합니다.</div>
-        </div>
-    </div>
-
-    <!-- Q4 -->
-    <div class="quiz-item" id="q4">
-        <div class="question">4. 인공지능이 자기 자신과 수백만 판의 대결을 하면서, 이기면 상을 받고 지면 벌을 받으며 스스로 실력을 키우는 훈련 방법의 이름은 무엇인가요?</div>
-        <ul class="options">
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz4" value="1"> ① 강화학습 (Reinforcement Learning)</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz4" value="2"> ② 기억학습 (Memory Learning)</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz4" value="3"> ③ 주입식 교육 (Cramming Method)</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz4" value="4"> ④ 가상현실 (Virtual Reality)</label>
-            </li>
-        </ul>
-        <button class="btn-check" onclick="checkAnswer(4, 1)">정답 확인</button>
-        <div class="result" id="result4">
-            <div class="result-title"></div>
-            <div class="explanation">해설: 어떤 환경에서 보상(상)을 최대화하는 행동을 스스로 시행착오를 겪으며 찾아내는 학습 방식입니다.</div>
-        </div>
-    </div>
-
-    <!-- Q5 -->
-    <div class="quiz-item" id="q5">
-        <div class="question">5. 수업 시간에 '강화학습'의 원리를 설명하기 위해 사용한 비유로 가장 알맞은 것은 무엇이었나요?</div>
-        <ul class="options">
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz5" value="1"> ① 수학 공식을 백 번 쓰면서 외우는 것</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz5" value="2"> ② 처음 자전거를 탈 때 넘어지면서 중심 잡는 법을 몸으로 깨우치는 것</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz5" value="3"> ③ 퍼즐 조각을 색깔별로 예쁘게 분류하는 것</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz5" value="4"> ④ 선생님의 설명을 듣고 필기를 꼼꼼히 하는 것</label>
-            </li>
-        </ul>
-        <button class="btn-check" onclick="checkAnswer(5, 2)">정답 확인</button>
-        <div class="result" id="result5">
-            <div class="result-title"></div>
-            <div class="explanation">해설: 실패(넘어짐)와 성공(나아감)을 반복하며 스스로 요령을 터득하는 자전거 연습 과정이 강화학습과 똑같습니다.</div>
-        </div>
-    </div>
-
-    <!-- Q6 -->
-    <div class="quiz-item" id="q6">
-        <div class="question">6. 바둑을 둘 때 모든 경우를 다 계산하면 시간이 너무 오래 걸립니다. 그래서 인공지능은 이길 확률이 가장 높은 몇 가지 길만 골라서 앞을 내다보는데, 이 똑똑한 찍기 기술을 무엇이라고 하나요?</div>
-        <ul class="options">
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz6" value="1"> ① 내비게이션 시스템</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz6" value="2"> ② 몬테카를로 트리 탐색</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz6" value="3"> ③ 알고리즘 정렬</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz6" value="4"> ④ 홀로그램 렌즈</label>
-            </li>
-        </ul>
-        <button class="btn-check" onclick="checkAnswer(6, 2)">정답 확인</button>
-        <div class="result" id="result6">
-            <div class="result-title"></div>
-            <div class="explanation">해설: 승률을 계산하여 가장 가능성 높은 경로(트리의 가지)를 집중적으로 파고드는 효율적인 탐색 방법입니다.</div>
-        </div>
-    </div>
-
-    <!-- Q7 -->
-    <div class="quiz-item" id="q7">
-        <div class="question">7. 다음 중 인공지능이 인간을 바둑에서 이기기 위해 사용한 '세 가지 핵심 비법'에 포함되지 않는 것은 무엇인가요?</div>
-        <ul class="options">
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz7" value="1"> ① 사람의 뇌처럼 스스로 학습하기 (딥러닝)</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz7" value="2"> ② 상과 벌을 통해 스스로 훈련하기 (강화학습)</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz7" value="3"> ③ 확률이 높은 길만 골라서 탐색하기 (몬테카를로 트리 탐색)</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz7" value="4"> ④ 세상의 모든 바둑 규칙을 매일 새롭게 바꾸기</label>
-            </li>
-        </ul>
-        <button class="btn-check" onclick="checkAnswer(7, 4)">정답 확인</button>
-        <div class="result" id="result7">
-            <div class="result-title"></div>
-            <div class="explanation">해설: 인공지능은 정해진 바둑 규칙 틀 안에서 최고의 효율을 찾아내는 것이지, 규칙 자체를 바꾸지 않습니다.</div>
-        </div>
-    </div>
-
-    <!-- Q8 -->
-    <div class="quiz-item" id="q8">
-        <div class="question">8. 과거의 컴퓨터와 인공지능(알파고)이 바둑을 대하는 방식의 차이점을 가장 바르게 설명한 학생은 누구인가요?</div>
-        <ul class="options">
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz8" value="1"> ① 지민: 과거 컴퓨터는 스스로 학습했고, 인공지능은 사람이 일일이 조종했어.</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz8" value="2"> ② 현우: 과거 컴퓨터는 모든 정답을 외우려고 했지만, 인공지능은 원리를 깨우치고 스스로 학습했어.</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz8" value="3"> ③ 수진: 과거 컴퓨터는 전기를 많이 썼고, 인공지능은 건전지만으로 움직여.</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz8" value="4"> ④ 민재: 사실 둘 다 완전히 똑같은 방식을 썼는데 속도만 달라진 거야.</label>
-            </li>
-        </ul>
-        <button class="btn-check" onclick="checkAnswer(8, 2)">정답 확인</button>
-        <div class="result" id="result8">
-            <div class="result-title"></div>
-            <div class="explanation">해설: 단순 암기형 계산 방식의 한계를 딥러닝과 강화학습이라는 '스스로 깨우치는 방식'으로 극복한 것이 핵심 차이점입니다.</div>
-        </div>
-    </div>
-
-    <!-- Q9 -->
-    <div class="quiz-item" id="q9">
-        <div class="question">9. 인공지능이 두는 '수'가 때로는 프로 기사들도 이해하지 못할 만큼 엉뚱해 보였지만, 결국 승리하게 만든 이유는 무엇일까요?</div>
-        <ul class="options">
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz9" value="1"> ① 컴퓨터가 오류를 일으켜서 무작위로 돌을 놓았기 때문에</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz9" value="2"> ② 인간이 아직 발견하지 못한 새롭고 승률이 높은 길을 찾아냈기 때문에</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz9" value="3"> ③ 상대방을 화나게 만들어서 실수를 유도하기 위해 일부러 장난을 쳤기 때문에</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz9" value="4"> ④ 바둑판의 줄 개수를 컴퓨터 마음대로 줄여서 계산했기 때문에</label>
-            </li>
-        </ul>
-        <button class="btn-check" onclick="checkAnswer(9, 2)">정답 확인</button>
-        <div class="result" id="result9">
-            <div class="result-title"></div>
-            <div class="explanation">해설: 사람의 고정관념이나 관습에 얽매이지 않고, 수많은 시뮬레이션을 통해 오직 '이길 확률'이 가장 높은 새로운 길을 계산해 낸 결과입니다.</div>
-        </div>
-    </div>
-
-    <!-- Q10 -->
-    <div class="quiz-item" id="q10">
-        <div class="question">10. 오늘 배운 내용을 종합해 볼 때, 인공지능에 대한 설명으로 알맞은 것은?</div>
-        <ul class="options">
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz10" value="1"> ① 인공지능은 처음부터 모든 정답을 머릿속에 저장하고 태어난다.</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz10" value="2"> ② 인공지능이 똑똑해지기 위해서는 방대한 데이터와 스스로 학습하는 훈련 과정이 필요하다.</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz10" value="3"> ③ 인공지능은 무조건 사람의 지시가 있을 때만 움직이며 스스로 발전할 수 없다.</label>
-            </li>
-            <li class="option-item">
-                <label class="option-label"><input type="radio" name="quiz10" value="4"> ④ 앞으로 인공지능은 오직 바둑이나 체스 같은 게임에서만 활용될 것이다.</label>
-            </li>
-        </ul>
-        <button class="btn-check" onclick="checkAnswer(10, 2)">정답 확인</button>
-        <div class="result" id="result10">
-            <div class="result-title"></div>
-            <div class="explanation">해설: 인공지능은 데이터(기보)를 통한 학습과 수많은 실전 연습(강화학습)을 거치며 점진적으로 발전합니다.</div>
-        </div>
-    </div>
-
-    <!-- 총점 계산 -->
-    <div class="score-container">
-        <button class="btn-total" onclick="calculateTotalScore()">내 점수 확인하기</button>
-        <div id="total-score"></div>
-    </div>
-</div>
-
-<script>
-    const userAnswers = {};
-    const totalQuestions = 10;
-
-    function checkAnswer(qNum, correctVal) {
-        const selected = document.querySelector(`input[name="quiz${qNum}"]:checked`);
-        const resultDiv = document.getElementById(`result${qNum}`);
-        const titleDiv = resultDiv.querySelector('.result-title');
-
-        if (!selected) {
-            alert("답을 먼저 선택해 주세요!");
-            return;
-        }
-
-        const userVal = parseInt(selected.value);
-        userAnswers[qNum] = userVal;
-
-        resultDiv.style.display = "block";
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
         
-        if (userVal === correctVal) {
-            resultDiv.className = "result correct";
-            titleDiv.innerText = "⭕ 정답입니다!";
-        } else {
-            resultDiv.className = "result incorrect";
-            titleDiv.innerText = `❌ 틀렸습니다! (정답: ${correctVal}번)`;
-        }
-    }
+        <!-- ================= STUDENT VIEW ================= -->
+        <div id="view-student" class="space-y-6">
+            <!-- Program Guide Banner -->
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl text-white p-6 sm:p-8 shadow-xl relative overflow-hidden">
+                <div class="absolute right-0 bottom-0 opacity-10 transform translate-x-10 translate-y-10 pointer-events-none">
+                    <i class="fa-solid fa-file-excel text-[240px]"></i>
+                </div>
+                <div class="relative z-10 max-w-3xl">
+                    <span class="bg-emerald-500/30 text-emerald-100 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase">온라인 만족도 조사</span>
+                    <h2 id="survey-title-text" class="text-xl sm:text-2xl font-black mt-3 leading-snug">2026학년도 집단상담 프로그램 만족도 조사</h2>
+                    <p id="survey-description-text" class="text-xs sm:text-sm text-emerald-100 mt-2.5 leading-relaxed font-light">
+                        본 설문조사는 참여하신 집단상담 프로그램에 대한 의견을 수렴하여 향후 더 유익하고 유용한 프로그램을 계획하고 운영하기 위한 자료인 '집단상담 통계표.xlsx' 양식과 실시간 연계되어 활용됩니다. 솔직하고 객관적인 답변을 부탁드립니다.
+                    </p>
+                    <div class="mt-4 flex flex-wrap gap-2.5">
+                        <span class="inline-flex items-center text-xs bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-xs">
+                            <i class="fa-solid fa-check-circle mr-1 text-emerald-300"></i>총 8개 문항 (선택형 7, 서술형 1)
+                        </span>
+                        <span class="inline-flex items-center text-xs bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-xs">
+                            <i class="fa-solid fa-file-invoice mr-1 text-emerald-300"></i>집단상담 통계표.xlsx 실시간 반영
+                        </span>
+                    </div>
+                </div>
+            </div>
 
-    function calculateTotalScore() {
-        let correctCount = 0;
-        const answers = { 1:3, 2:2, 3:3, 4:1, 5:2, 6:2, 7:4, 8:2, 9:2, 10:2 };
+            <!-- Main Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- Left side: Excel Interactive Info -->
+                <div class="lg:col-span-4 space-y-4">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-premium">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center mb-3">
+                            <i class="fa-solid fa-square-poll-vertical text-emerald-600 mr-2"></i>통계 연계 매커니즘
+                        </h3>
+                        <p class="text-xs text-slate-500 leading-relaxed mb-4">
+                            여러분이 제출한 평가는 학년/반 구분에 맞추어 통계표 서식인 <b>"집단상담 통계표.xlsx"</b>의 각 행(C열 ~ I열)에 실시간으로 집계 및 평균 연산되어 계산됩니다.
+                        </p>
+                        
+                        <!-- Simple visual connection graph -->
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3.5">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="bg-brand-500 text-white font-bold px-2.5 py-1 rounded-md">설문 응답 제출</span>
+                                <i class="fa-solid fa-arrow-right text-slate-400 animate-pulse"></i>
+                                <span class="bg-emerald-600 text-white font-bold px-2.5 py-1 rounded-md">실시간 학급별 집계</span>
+                            </div>
+                            <div class="h-px bg-slate-200"></div>
+                            <div class="flex items-center space-x-2 text-xs text-slate-600">
+                                <i class="fa-regular fa-file-excel text-emerald-600 text-base"></i>
+                                <span><b>집단상담 통계표.xlsx</b>에 즉시 반영됨</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 pt-4 border-t border-slate-100">
+                            <button onclick="triggerExcelMockView()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-expand"></i> 엑셀 파일(xlsx) 실시간 연산 보기
+                            </button>
+                        </div>
+                    </div>
 
-        for (let i = 1; i <= totalQuestions; i++) {
-            if (userAnswers[i] === answers[i]) {
-                correctCount++;
+                    <!-- Guidelines -->
+                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-5 rounded-2xl text-white shadow-premium">
+                        <h4 class="font-bold text-xs text-slate-300 uppercase tracking-widest mb-2">개인정보 보호 안내</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed mb-3">
+                            본 평가는 전면 익명으로 안전하게 보장되며, 학교 집단상담 개선 자료 이외의 어떠한 목적이나 학생 평가 등에 절대 활용되지 않으므로 솔직하게 작성해주세요.
+                        </p>
+                        <div class="flex items-center gap-1 text-[11px] text-emerald-400 font-bold">
+                            <i class="fa-solid fa-shield-halved"></i> 안전한 실시간 익명 암호화 송신
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right side: Questionnaire Form Card -->
+                <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200/80 shadow-premium overflow-hidden">
+                    <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div>
+                            <h3 class="font-black text-slate-800 text-base">만족도 평가 설문지 작성</h3>
+                            <p class="text-xs text-slate-400">모든 항목(*)을 확인하고 신중하게 작성해 주세요.</p>
+                        </div>
+                        <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-lg">
+                            <i class="fa-regular fa-clock mr-1"></i>소요시간 약 1분
+                        </span>
+                    </div>
+
+                    <form id="student-survey-form" onsubmit="handleSurveySubmit(event)" class="p-6 space-y-6">
+                        <!-- Demographics Panel (Updated with Date, School, Grade/Class, Gender) -->
+                        <div class="p-4 bg-brand-50/50 rounded-xl border border-brand-100/50 grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5" for="survey-date">
+                                    <i class="fa-regular fa-calendar mr-1 text-brand-500"></i>작성일 *
+                                </label>
+                                <input type="date" id="survey-date" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none transition bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5" for="survey-school">
+                                    <i class="fa-solid fa-school mr-1 text-brand-500"></i>학교 *
+                                </label>
+                                <input type="text" id="survey-school" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none transition bg-white" placeholder="예: 가람중학교">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5" for="survey-grade-class">
+                                    <i class="fa-solid fa-graduation-cap mr-1 text-brand-500"></i>학년반 *
+                                </label>
+                                <input type="text" id="survey-grade-class" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none transition bg-white" placeholder="예: 1학년 3반">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                                    <i class="fa-solid fa-venus-mars mr-1 text-brand-500"></i>성별 *
+                                </label>
+                                <div class="flex gap-4 py-1.5">
+                                    <label class="inline-flex items-center text-xs cursor-pointer text-slate-700 font-medium">
+                                        <input type="radio" name="survey-gender" value="남" required class="text-brand-600 focus:ring-brand-500 mr-1.5 h-4 w-4"> 남
+                                    </label>
+                                    <label class="inline-flex items-center text-xs cursor-pointer text-slate-700 font-medium">
+                                        <input type="radio" name="survey-gender" value="여" required class="text-brand-600 focus:ring-brand-500 mr-1.5 h-4 w-4"> 여
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Questions Injection Container -->
+                        <div class="space-y-4" id="rating-questions-container">
+                            <!-- Dynamic Rating Questions Go Here -->
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="pt-4 border-t border-slate-100 flex justify-end gap-3">
+                            <button type="button" onclick="resetSurveyForm()" class="px-5 py-3 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-xl text-xs font-bold transition duration-200">
+                                다시 작성
+                            </button>
+                            <button type="submit" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-7 py-3 rounded-xl text-xs font-bold shadow-md shadow-emerald-100 hover:shadow-lg transition duration-200 flex items-center gap-1.5">
+                                <i class="fa-solid fa-paper-plane"></i> 설문 제출 완료
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TEACHER DASHBOARD VIEW ================= -->
+        <div id="view-teacher" class="hidden space-y-6">
+            
+            <!-- Dashboard Toolbar -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-premium flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-toolbox text-base"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-slate-800 text-sm">교사 통합 분석 대시보드</h3>
+                        <p class="text-[11px] text-slate-400">학생 만족도 통계 실시간 분석 및 문서 변환 내보내기</p>
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                    <button onclick="exportToCSV()" class="flex-1 md:flex-none bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs transition duration-150 flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-file-export"></i> 집단상담 통계표.csv 내보내기
+                    </button>
+                    <button onclick="copySurveyLink()" class="flex-1 md:flex-none bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs transition duration-150 flex items-center justify-center gap-1.5">
+                        <i class="fa-regular fa-copy"></i> 학생용 설문링크 복사
+                    </button>
+                    <button onclick="generateMockResponses()" class="flex-1 md:flex-none bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2.5 rounded-xl transition flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> 테스트셋 생성
+                    </button>
+                    <button onclick="confirmClearAllResponses()" class="flex-1 md:flex-none bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold px-3 py-2.5 rounded-xl transition flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-trash-can"></i> 전체 데이터 초기화
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Sub-Tabs -->
+            <div class="border-b border-slate-200 flex space-x-6">
+                <button id="tab-teacher-charts" onclick="switchTeacherTab('charts')" class="pb-3 border-b-2 border-brand-600 text-brand-600 text-xs font-black transition">
+                    <i class="fa-solid fa-chart-line mr-1.5"></i>핵심 성과 분석 및 통계차트
+                </button>
+                <button id="tab-teacher-excel" onclick="switchTeacherTab('excel')" class="pb-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 text-xs font-bold transition">
+                    <i class="fa-solid fa-file-excel mr-1.5"></i>집단상담 통계표.xlsx 미리보기
+                </button>
+                <button id="tab-teacher-responses" onclick="switchTeacherTab('responses')" class="pb-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 text-xs font-bold transition">
+                    <i class="fa-solid fa-list-check mr-1.5"></i>개별 응답 상세기록
+                </button>
+            </div>
+
+            <!-- Tab 1: Charts & Key Metrics -->
+            <div id="teacher-tab-charts" class="space-y-6">
+                <!-- Summary Widgets Card Grid -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-premium flex items-center gap-4">
+                        <div class="w-10 h-10 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center text-lg shadow-inner"><i class="fa-solid fa-user-check"></i></div>
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">누적 응답자 수</p>
+                            <h4 class="text-lg font-black text-slate-800 mt-0.5" id="metric-total-count">0명</h4>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-premium flex items-center gap-4">
+                        <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg shadow-inner"><i class="fa-solid fa-star"></i></div>
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">종합 만족도 평균</p>
+                            <h4 class="text-lg font-black text-slate-800 mt-0.5" id="metric-total-avg">0.00 / 5.0</h4>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-premium flex items-center gap-4">
+                        <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-lg shadow-inner"><i class="fa-solid fa-school"></i></div>
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">최우수 평가 학년반</p>
+                            <h4 class="text-xs font-black text-slate-800 mt-0.5 truncate max-w-[140px]" id="metric-top-group">-</h4>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-premium flex items-center gap-4">
+                        <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-lg shadow-inner"><i class="fa-solid fa-bullhorn"></i></div>
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">기타의견 제출 건수</p>
+                            <h4 class="text-lg font-black text-slate-800 mt-0.5" id="metric-feedback-count">0건</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts layout -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-premium flex flex-col justify-between h-[360px]">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-xs mb-1">문항별 종합 만족도 분포 (Q1 ~ Q7)</h4>
+                            <p class="text-[10px] text-slate-400 mb-3">질문구분 기준별 가중치 평균 점수 대조 레이아웃입니다.</p>
+                        </div>
+                        <div class="flex-1 relative flex items-center justify-center">
+                            <canvas id="chart-metrics-radar" class="max-h-[250px] w-full"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-premium flex flex-col justify-between h-[360px]">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-xs mb-1">학년/반별 성과 비교</h4>
+                            <p class="text-[10px] text-slate-400 mb-3">각 학년/반의 통합 평균 연산 지표 대조 그래프입니다.</p>
+                        </div>
+                        <div class="flex-1 relative flex items-center justify-center">
+                            <canvas id="chart-groups-bar" class="max-h-[250px] w-full"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: 집단상담 통계표.xlsx Real-Time Preview Table -->
+            <div id="teacher-tab-excel" class="hidden">
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-premium overflow-hidden">
+                    <div class="bg-slate-50 p-4 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-emerald-600 text-white rounded-lg flex items-center justify-center font-bold text-xs shadow-sm">EX</div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-xs sm:text-sm">집단상담 통계표.xlsx 실시간 미리보기 (7문항 최적화)</h4>
+                                <p class="text-[11px] text-slate-400">교사 결재 및 소장 보고서용 학년/반 행렬 데이터 구조</p>
+                            </div>
+                        </div>
+                        <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-[10px] font-bold">
+                            <i class="fa-solid fa-arrows-spin fa-spin mr-1"></i>계산공식 자동 적용중 (C열~I열 평균 연산)
+                        </span>
+                    </div>
+
+                    <!-- Excel Matrix Sheet Representation -->
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left border-collapse text-xs font-sans">
+                            <thead>
+                                <tr class="bg-slate-100/80 text-slate-600 border-b border-slate-200 font-semibold">
+                                    <th class="p-3 border-r border-slate-200 text-center w-12">행(Row)</th>
+                                    <th class="p-3 border-r border-slate-200">학년/반 구분 [열 A]</th>
+                                    <th class="p-3 border-r border-slate-200 text-center w-28">참여 인원 [열 B]</th>
+                                    <th class="p-3 border-r border-slate-200 text-center bg-emerald-50/20 text-emerald-800">Q1.도움 [열 C]</th>
+                                    <th class="p-3 border-r border-slate-200 text-center bg-emerald-50/20 text-emerald-800">Q2.자신감 [열 D]</th>
+                                    <th class="p-3 border-r border-slate-200 text-center bg-emerald-50/20 text-emerald-800">Q3.감정표현 [열 E]</th>
+                                    <th class="p-3 border-r border-slate-200 text-center bg-emerald-50/20 text-emerald-800">Q4.회복 [열 F]</th>
+                                    <th class="p-3 border-r border-slate-200 text-center bg-emerald-50/20 text-emerald-800">Q5.성찰 [열 G]</th>
+                                    <th class="p-3 border-r border-slate-200 text-center bg-emerald-50/20 text-emerald-800">Q6.관계개선 [열 H]</th>
+                                    <th class="p-3 border-r border-slate-200 text-center bg-emerald-50/20 text-emerald-800">Q7.추천 [열 I]</th>
+                                    <th class="p-3 text-center bg-indigo-50/40 text-indigo-900 font-bold">합계평균 [열 J]</th>
+                                </tr>
+                            </thead>
+                            <tbody id="excel-table-body" class="text-slate-700 divide-y divide-slate-100">
+                                <!-- Computed statistics per group will go here dynamically -->
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-slate-50 font-bold text-slate-800 border-t-2 border-slate-200" id="excel-table-footer">
+                                    <!-- Overall aggregate computed here -->
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Detailed Response List -->
+            <div id="teacher-tab-responses" class="hidden space-y-4">
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-premium overflow-hidden">
+                    <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-slate-50/40">
+                        <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-list-check mr-1.5 text-brand-500"></i>학생별 입력값 및 기타 의견 상세 데이터</span>
+                        <span class="text-[11px] text-slate-400 font-medium" id="response-count-badge">0건의 데이터 수집됨</span>
+                    </div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 border-b border-slate-200 font-semibold">
+                                    <th class="p-3">작성일</th>
+                                    <th class="p-3">학교</th>
+                                    <th class="p-3">학년반</th>
+                                    <th class="p-3 text-center">성별</th>
+                                    <th class="p-3 text-center">Q1</th>
+                                    <th class="p-3 text-center">Q2</th>
+                                    <th class="p-3 text-center">Q3</th>
+                                    <th class="p-3 text-center">Q4</th>
+                                    <th class="p-3 text-center">Q5</th>
+                                    <th class="p-3 text-center">Q6</th>
+                                    <th class="p-3 text-center">Q7</th>
+                                    <th class="p-3">기타의견 (자유 서술)</th>
+                                    <th class="p-3 text-center">제출일시</th>
+                                    <th class="p-3 text-center">관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-responses-list-body" class="text-slate-700 divide-y divide-slate-100">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- PASSWORD VERIFICATION MODAL FOR TEACHER ACCESS -->
+    <div id="teacher-auth-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100">
+            <div class="text-center mb-5">
+                <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-xl mx-auto mb-3">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="text-base font-black text-slate-800">교사 비밀번호 확인</h3>
+                <p class="text-xs text-slate-400 mt-1">대시보드와 중요 통계 데이터 수집 화면을 보호하기 위한 보안 비밀번호를 기입해 주세요.</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">관리 비밀번호</label>
+                    <input type="password" id="teacher-pwd-input" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-center text-lg font-mono focus:ring-2 focus:ring-brand-500 focus:outline-none transition bg-slate-50" placeholder="••••" maxlength="4">
+                    <p class="text-[10px] text-brand-600 font-bold mt-1.5 text-center"><i class="fa-solid fa-circle-info mr-1"></i>초기 비밀번호는 <strong>1234</strong> 입니다.</p>
+                </div>
+                <div class="flex gap-2.5">
+                    <button onclick="closeTeacherAuthModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-xs font-bold transition">닫기</button>
+                    <button onclick="verifyTeacherPassword()" class="flex-1 bg-brand-600 hover:bg-brand-700 text-white py-2.5 rounded-xl text-xs font-bold shadow-md shadow-brand-100 transition">인증 완료</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOCK PREVIEW FILE MODAL -->
+    <div id="mock-excel-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-5xl w-full p-6 shadow-2xl border border-slate-100 transform scale-95 transition-all">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-table text-emerald-500 text-xl"></i>
+                    <h3 class="text-base font-bold text-slate-800">"집단상담 통계표.xlsx" 미리보기 및 실시간 연산</h3>
+                </div>
+                <button onclick="closeExcelMockView()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">
+                학년/반 구분에 따른 통계 시뮬레이터입니다. 설문 데이터 등록 및 수정 시 실시간으로 평균과 가중 지표가 자동 정밀 연산됩니다.
+            </p>
+            
+            <div class="overflow-x-auto border border-slate-200 rounded-xl mb-4 custom-scrollbar">
+                <table class="w-full text-xs text-left border-collapse">
+                    <thead>
+                        <tr class="bg-emerald-50 text-emerald-950 border-b border-slate-200">
+                            <th class="p-2 border-r border-slate-200 font-semibold text-center bg-emerald-100/50">셀</th>
+                            <th class="p-2 border-r border-slate-200 font-semibold">학년/반 구분 [A]</th>
+                            <th class="p-2 border-r border-slate-200 font-semibold text-center">참여인원 [B]</th>
+                            <th class="p-2 border-r border-slate-200 font-semibold text-center">Q1 [C]</th>
+                            <th class="p-2 border-r border-slate-200 font-semibold text-center">Q2 [D]</th>
+                            <th class="p-2 border-r border-slate-200 font-semibold text-center">Q3 [E]</th>
+                            <th class="p-2 border-r border-slate-200 font-semibold text-center">Q4 [F]</th>
+                            <th class="p-2 border-r border-slate-200 font-semibold text-center">Q5 [G]</th>
+                            <th class="p-2 border-r border-slate-200 font-semibold text-center">Q6 [H]</th>
+                            <th class="p-2 border-r border-slate-200 font-semibold text-center">Q7 [I]</th>
+                            <th class="p-2 font-semibold text-center bg-emerald-100">합계평균 [J]</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mock-excel-table-body" class="divide-y divide-slate-100">
+                        <!-- Populated identically to the statistics data dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button onclick="closeExcelMockView()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl text-xs font-semibold transition">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+    <!-- CONFIRMATION DIALOG MODAL -->
+    <div id="confirm-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100">
+            <div class="text-center mb-5">
+                <div id="confirm-icon-bg" class="w-12 h-12 rounded-full flex items-center justify-center text-xl mx-auto mb-3">
+                    <i id="confirm-icon"></i>
+                </div>
+                <h3 id="confirm-title" class="text-base font-black text-slate-800"></h3>
+                <p id="confirm-message" class="text-xs text-slate-400 mt-1"></p>
+            </div>
+            <div class="flex gap-2.5">
+                <button onclick="closeConfirmModal(false)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-xs font-bold transition">취소</button>
+                <button id="confirm-ok-btn" onclick="closeConfirmModal(true)" class="flex-1 py-2.5 rounded-xl text-xs font-bold shadow-md transition"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-100 py-5 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-slate-400 text-[10px] font-medium space-y-1">
+            <p>© 2026 Wee클래스 전문 집단상담 모니터링 시스템.</p>
+            <p>본 포털의 모든 실시간 통계 연산 구조는 '집단상담 통계표.xlsx' 서식과 오차 없이 일치하여 활용하기 매우 편리합니다.</p>
+        </div>
+    </footer>
+
+    <!-- Script Engine -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global State Manager
+        window.AppState = {
+            role: 'student', // Default view role
+            surveyConfig: {
+                title: "2026학년도 집단상담 만족도 조사",
+                description: "본 설문조사는 참여하신 집단상담 프로그램에 대한 의견을 수렴하여 향후 더 유익하고 유용한 프로그램을 계획하고 운영하기 위한 자료인 '집단상담 통계표.xlsx' 양식과 실시간 연계되어 활용됩니다. 솔직하고 객관적인 답변을 부탁드립니다.",
+                attachedFile: "집단상담 통계표.xlsx",
+                questions: [
+                    { id: "q1", label: "이 프로그램이 나에게 도움이 되었다.", type: "rating", category: "도움 유무" },
+                    { id: "q2", label: "프로그램을 통해 마음에 품고 있었던 어려움을 해결할 수 있는 자신감이 생겼다.", type: "rating", category: "해결 자신감" },
+                    { id: "q3", label: "프로그램을 통해서 마음속의 여러 감정을 표현하고 공감 받을 수 있었다.", type: "rating", category: "감정 공감" },
+                    { id: "q4", label: "이 프로그램은 일상생활 회복 및 개선에 도움이 될 것이다.", type: "rating", category: "일상 회복" },
+                    { id: "q5", label: "프로그램을 통해 내 자신이 더 좋은 사람이 된 것 같은 느낌이 든다.", type: "rating", category: "자아 성찰" },
+                    { id: "q6", label: "프로그램이 친구들과의 관계 개선에 도움이 되었다.", type: "rating", category: "관계 개선" },
+                    { id: "q7", label: "다른 친구들에게 이 프로그램을 추천하고 싶다.", type: "rating", category: "추천 의향" },
+                    { id: "q8", label: "기타의견 (프로그램 참여 중 느낀 점이나 희망사항을 자유롭게 기입해주세요.)", type: "text", category: "자유 서술" }
+                ],
+                defaultClasses: [
+                    "1학년 1반", "1학년 2반", "1학년 3반", "2학년 1반", "2학년 2반", "3학년 1반"
+                ]
+            },
+            responses: [],
+            isOnline: false,
+            db: null,
+            auth: null,
+            userId: null,
+            appId: typeof __app_id !== 'undefined' ? __app_id : 'group-counseling-survey',
+            surveyStats: {
+                byClass: {},
+                byMetric: {},
+                uniqueClasses: []
+            }
+        };
+
+        const firebaseConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
+        let firebaseInitialized = false;
+
+        if (firebaseConfigStr) {
+            try {
+                const firebaseConfig = JSON.parse(firebaseConfigStr);
+                const app = initializeApp(firebaseConfig);
+                window.AppState.db = getFirestore(app);
+                window.AppState.auth = getAuth(app);
+                firebaseInitialized = true;
+            } catch (e) {
+                console.warn("Firebase initialization failed. Falling back to Local Memory.", e);
             }
         }
 
-        const scoreDiv = document.getElementById('total-score');
-        scoreDiv.style.display = "block";
-        scoreDiv.innerHTML = `맞힌 개수: ${correctCount} / ${totalQuestions} <br> <span style="font-size: 20px; color: #555555;">(총점: ${correctCount * 10}점)</span>`;
-        
-        window.scrollTo({
-            top: document.body.scrollHeight,
-            behavior: 'smooth'
-        });
-    }
-</script>
+        async function initAuthAndData() {
+            if (!firebaseInitialized) {
+                loadLocalFallbackData();
+                showNotification("오프라인 데모 모드로 실행됩니다. 브라우저 메모리에 가상 데이터가 유지됩니다.", "warning");
+                renderApp();
+                return;
+            }
 
+            try {
+                const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                let userCredential;
+                if (initialToken) {
+                    userCredential = await signInWithCustomToken(window.AppState.auth, initialToken);
+                } else {
+                    userCredential = await signInAnonymously(window.AppState.auth);
+                }
+                
+                window.AppState.userId = userCredential.user.uid;
+                window.AppState.isOnline = true;
+                document.getElementById('connection-badge').innerHTML = `
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+                        <i class="fa-solid fa-cloud-bolt mr-1 text-[9px] text-emerald-600 animate-pulse"></i> 실시간 서버 연결됨
+                    </span>`;
+
+                // Sync Survey Config
+                const configDocRef = doc(window.AppState.db, 'artifacts', window.AppState.appId, 'public', 'data', 'survey_config', 'default');
+                const configSnap = await getDoc(configDocRef);
+                if (configSnap.exists()) {
+                    window.AppState.surveyConfig = configSnap.data();
+                } else {
+                    await setDoc(configDocRef, window.AppState.surveyConfig);
+                }
+
+                // Listen to Survey Responses
+                const responsesColRef = collection(window.AppState.db, 'artifacts', window.AppState.appId, 'public', 'data', 'responses');
+                onSnapshot(responsesColRef, (snapshot) => {
+                    const loadedResponses = [];
+                    snapshot.forEach((doc) => {
+                        loadedResponses.push({ id: doc.id, ...doc.data() });
+                    });
+                    window.AppState.responses = loadedResponses;
+                    calculateStatistics();
+                    renderApp();
+                }, (error) => {
+                    console.error("Firestore onSnapshot error:", error);
+                    showNotification("서버에서 실시간 데이터를 수신하는데 오류가 발생했습니다.", "error");
+                });
+
+            } catch (e) {
+                console.error("Firebase auth/data syncing failed:", e);
+                loadLocalFallbackData();
+                showNotification("서버 연결 실패로 인해 로컬 메모리 모드를 실행합니다.", "info");
+                renderApp();
+            }
+        }
+
+        window.saveSurveyResponse = async function(responseObj) {
+            if (window.AppState.isOnline && window.AppState.db) {
+                try {
+                    const responsesColRef = collection(window.AppState.db, 'artifacts', window.AppState.appId, 'public', 'data', 'responses');
+                    await addDoc(responsesColRef, responseObj);
+                    showNotification("설문이 실시간 온라인 서버로 안전하게 저장되었습니다!", "success");
+                } catch (e) {
+                    console.error("Failed to post online response", e);
+                    saveToLocalFallback(responseObj);
+                }
+            } else {
+                saveToLocalFallback(responseObj);
+            }
+        }
+
+        window.deleteSurveyResponse = async function(docId) {
+            if (window.AppState.isOnline && window.AppState.db) {
+                try {
+                    const docRef = doc(window.AppState.db, 'artifacts', window.AppState.appId, 'public', 'data', 'responses', docId);
+                    await deleteDoc(docRef);
+                    showNotification("응답 데이터가 정상적으로 완전히 삭제되었습니다.", "success");
+                } catch (e) {
+                    console.error("Error deleting document from Firebase", e);
+                    deleteFromLocal(docId);
+                }
+            } else {
+                deleteFromLocal(docId);
+            }
+        }
+
+        window.clearAllDatabaseResponses = async function() {
+            if (window.AppState.isOnline && window.AppState.db) {
+                try {
+                    const colRef = collection(window.AppState.db, 'artifacts', window.AppState.appId, 'public', 'data', 'responses');
+                    const snap = await getDocs(colRef);
+                    const deletePromises = [];
+                    snap.forEach((doc) => {
+                        deletePromises.push(deleteDoc(doc.ref));
+                    });
+                    await Promise.all(deletePromises);
+                    showNotification("모든 서버 데이터가 초기화 상태로 환원되었습니다.", "success");
+                } catch (e) {
+                    console.error("Error cleaning database collections", e);
+                }
+            } else {
+                localStorage.removeItem('local_survey_responses_v3');
+                window.AppState.responses = [];
+                calculateStatistics();
+                renderApp();
+                showNotification("로컬 평가 정보가 완전히 삭제되었습니다.", "success");
+            }
+        }
+
+        function loadLocalFallbackData() {
+            const localData = localStorage.getItem('local_survey_responses_v3');
+            if (localData) {
+                window.AppState.responses = JSON.parse(localData);
+            } else {
+                // High fidelity initial fallback mock matching [date, school, gradeClass, gender] schema
+                window.AppState.responses = [
+                    { id: "mock-1", date: "2026-06-01", school: "가람중학교", gradeClass: "1학년 1반", gender: "여", answers: { q1: 5, q2: 5, q3: 5, q4: 5, q5: 4, q6: 5, q7: 5, q8: "처음으로 저의 마음을 진솔하게 공유하고 따뜻하게 위로받아 너무 감사했습니다." }, timestamp: new Date(Date.now() - 36000000).toISOString() },
+                    { id: "mock-2", date: "2026-06-01", school: "가람중학교", gradeClass: "1학년 2반", gender: "여", answers: { q1: 4, q2: 5, q3: 4, q4: 5, q5: 5, q6: 4, q7: 5, q8: "진로에 대한 막막함이 구체적인 로드맵과 친구들의 이야기를 통해 해소되어 매우 든든했습니다." }, timestamp: new Date(Date.now() - 25000000).toISOString() },
+                    { id: "mock-3", date: "2026-06-02", school: "가람중학교", gradeClass: "2학년 1반", gender: "남", answers: { q1: 5, q2: 4, q3: 5, q4: 4, q5: 4, q6: 5, q7: 5, q8: "친구들과 깊이 있게 소통할 수 있었던 최고의 기회였습니다." }, timestamp: new Date(Date.now() - 15000000).toISOString() },
+                    { id: "mock-4", date: "2026-06-02", school: "가람중학교", gradeClass: "3학년 2반", gender: "여", answers: { q1: 4, q2: 4, q3: 5, q4: 5, q5: 5, q6: 4, q7: 4, q8: "감정 다루기가 어려웠는데 심호흡과 대화 명상 등을 배울 수 있어서 실제 생활에 도움될 것 같습니다." }, timestamp: new Date(Date.now() - 5000000).toISOString() }
+                ];
+                localStorage.setItem('local_survey_responses_v3', JSON.stringify(window.AppState.responses));
+            }
+            calculateStatistics();
+        }
+
+        function saveToLocalFallback(responseObj) {
+            window.AppState.responses.push(responseObj);
+            localStorage.setItem('local_survey_responses_v3', JSON.stringify(window.AppState.responses));
+            calculateStatistics();
+            renderApp();
+            showNotification("로컬 브라우저 저장소에 정상 보관 완료되었습니다.", "success");
+        }
+
+        function deleteFromLocal(docId) {
+            window.AppState.responses = window.AppState.responses.filter(r => r.id !== docId);
+            localStorage.setItem('local_survey_responses_v3', JSON.stringify(window.AppState.responses));
+            calculateStatistics();
+            renderApp();
+            showNotification("해당 응답 기록이 로컬 메모리에서 제외되었습니다.", "success");
+        }
+
+        window.onload = () => {
+            initAuthAndData();
+            populateStudentFormFields();
+            
+            // Auto fill current date in student form
+            const dateInput = document.getElementById('survey-date');
+            if (dateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.value = today;
+            }
+        };
+    </script>
+
+    <!-- Application Interactive Controller Script (Standard Javascript) -->
+    <script>
+        let radarChartInstance = null;
+        let barChartInstance = null;
+
+        // Populate Student Form
+        function populateStudentFormFields() {
+            const config = window.AppState.surveyConfig;
+            
+            // Set main text content
+            document.getElementById('survey-title-text').textContent = config.title;
+            document.getElementById('survey-description-text').textContent = config.description;
+
+            // Generate Likert Questions (Rating 1 to 5)
+            const questionsContainer = document.getElementById('rating-questions-container');
+            questionsContainer.innerHTML = '';
+
+            config.questions.forEach((q, index) => {
+                const questionCard = document.createElement('div');
+                questionCard.className = "p-5 border border-slate-100 rounded-xl hover:border-slate-200 hover:bg-slate-50/20 transition flex flex-col gap-4";
+                
+                if (q.type === 'rating') {
+                    // Rating Item Layout
+                    questionCard.innerHTML = `
+                        <div class="flex justify-between items-start gap-2">
+                            <div>
+                                <span class="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-md text-[10px] font-bold mr-2">Q${index + 1}. ${q.category}</span>
+                                <span class="text-xs font-bold text-slate-800">${index + 1}. ${q.label} *</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between gap-2 max-w-lg mt-1 bg-slate-50 p-3 rounded-lg border border-slate-100/80">
+                            <span class="text-[10px] font-medium text-slate-400">전혀 그렇지 않다 (1)</span>
+                            <div class="flex items-center gap-2">
+                                ${[1, 2, 3, 4, 5].map(num => `
+                                    <label class="cursor-pointer relative group">
+                                        <input type="radio" name="q_${q.id}" value="${num}" required class="sr-only peer">
+                                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-slate-200 flex items-center justify-center text-xs font-black text-slate-500 peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:border-emerald-500 group-hover:bg-slate-100 transition duration-150">
+                                            ${num}
+                                        </div>
+                                    </label>
+                                `).join('')}
+                            </div>
+                            <span class="text-[10px] font-medium text-slate-400">매우 그렇다 (5)</span>
+                        </div>
+                    `;
+                } else if (q.type === 'text') {
+                    // Text Item Layout
+                    questionCard.innerHTML = `
+                        <div>
+                            <span class="bg-rose-50 text-rose-700 px-2.5 py-1 rounded-md text-[10px] font-bold mr-2">자유 서술</span>
+                            <label class="text-xs font-bold text-slate-800" for="text_input_${q.id}">${index + 1}. ${q.label}</label>
+                        </div>
+                        <textarea id="text_input_${q.id}" rows="4" class="w-full mt-2 px-3.5 py-2.5 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="여기에 소감을 자유롭게 입력하세요. 선생님들이 다음 교육 계획을 수립할 때 귀중한 자료로 사용됩니다."></textarea>
+                    `;
+                }
+                questionsContainer.appendChild(questionCard);
+            });
+        }
+
+        // Switch Role UI System
+        function switchRole(role) {
+            if (role === 'student') {
+                window.AppState.role = 'student';
+                document.getElementById('view-student').classList.remove('hidden');
+                document.getElementById('view-teacher').classList.add('hidden');
+                document.getElementById('btn-role-student').className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition duration-200 bg-white text-slate-800 shadow-xs";
+                document.getElementById('btn-role-teacher').className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition duration-200 text-slate-500 hover:text-slate-800";
+                populateStudentFormFields();
+            } else if (role === 'teacher') {
+                // Open Passcode Modal
+                document.getElementById('teacher-auth-modal').classList.remove('hidden');
+                document.getElementById('teacher-pwd-input').focus();
+            }
+        }
+
+        // Verification logic for Admin
+        function verifyTeacherPassword() {
+            const pwd = document.getElementById('teacher-pwd-input').value;
+            if (pwd === "1234") {
+                window.AppState.role = 'teacher';
+                document.getElementById('view-student').classList.add('hidden');
+                document.getElementById('view-teacher').classList.remove('hidden');
+                document.getElementById('btn-role-student').className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition duration-200 text-slate-500 hover:text-slate-800";
+                document.getElementById('btn-role-teacher').className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition duration-200 bg-white text-slate-800 shadow-xs";
+                closeTeacherAuthModal();
+                showNotification("교사용 통합 관리자 인증에 성공했습니다.", "success");
+                renderApp();
+            } else {
+                showNotification("비밀번호가 불일치합니다. 다시 입력하세요.", "error");
+                document.getElementById('teacher-pwd-input').value = "";
+                document.getElementById('teacher-pwd-input').focus();
+            }
+        }
+
+        function closeTeacherAuthModal() {
+            document.getElementById('teacher-auth-modal').classList.add('hidden');
+            document.getElementById('teacher-pwd-input').value = "";
+        }
+
+        // Formulate core Excel stats (Grouped dynamically by 학년/반)
+        function calculateStatistics() {
+            const responses = window.AppState.responses;
+            const config = window.AppState.surveyConfig;
+
+            // Gather all unique classes (default defined classes + any custom submitted classes)
+            const uniqueClasses = Array.from(new Set([
+                ...config.defaultClasses,
+                ...responses.map(r => r.gradeClass).filter(Boolean)
+            ]));
+
+            // Sort school classes logically
+            uniqueClasses.sort((a, b) => a.localeCompare(b, 'ko'));
+
+            // Clean init structure for each class group
+            const byClass = {};
+            uniqueClasses.forEach(cls => {
+                byClass[cls] = {
+                    count: 0,
+                    ratings: {},
+                    totalSum: 0,
+                    totalCount: 0
+                };
+                config.questions.forEach(q => {
+                    if (q.type === 'rating') {
+                        byClass[cls].ratings[q.id] = { sum: 0, count: 0 };
+                    }
+                });
+            });
+
+            const byMetric = {};
+            config.questions.forEach(q => {
+                if (q.type === 'rating') {
+                    byMetric[q.id] = { sum: 0, count: 0, label: q.category };
+                }
+            });
+
+            // Aggregate data points
+            responses.forEach(r => {
+                const cls = r.gradeClass;
+                if (!byClass[cls]) {
+                    // Fail-safe dynamic allocation
+                    byClass[cls] = {
+                        count: 0,
+                        ratings: {},
+                        totalSum: 0,
+                        totalCount: 0
+                    };
+                    config.questions.forEach(q => {
+                        if (q.type === 'rating') {
+                            byClass[cls].ratings[q.id] = { sum: 0, count: 0 };
+                        }
+                    });
+                }
+
+                byClass[cls].count++;
+
+                config.questions.forEach(q => {
+                    if (q.type === 'rating') {
+                        const val = parseInt(r.answers[q.id]);
+                        if (val && !isNaN(val)) {
+                            // Class wise
+                            byClass[cls].ratings[q.id].sum += val;
+                            byClass[cls].ratings[q.id].count++;
+                            byClass[cls].totalSum += val;
+                            byClass[cls].totalCount++;
+
+                            // Overall Metric wise
+                            byMetric[q.id].sum += val;
+                            byMetric[q.id].count++;
+                        }
+                    }
+                });
+            });
+
+            window.AppState.surveyStats = {
+                byClass,
+                byMetric,
+                uniqueClasses
+            };
+        }
+
+        // RENDER CENTRAL
+        function renderApp() {
+            if (window.AppState.role === 'teacher') {
+                renderTeacherMetrics();
+                renderExcelTabContents();
+                renderResponsesTabContents();
+                renderCharts();
+            }
+        }
+
+        // Tab Switching inside Teacher
+        function switchTeacherTab(tabName) {
+            document.getElementById('teacher-tab-charts').classList.add('hidden');
+            document.getElementById('teacher-tab-excel').classList.add('hidden');
+            document.getElementById('teacher-tab-responses').classList.add('hidden');
+
+            document.getElementById('tab-teacher-charts').className = "pb-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 text-xs font-bold transition";
+            document.getElementById('tab-teacher-excel').className = "pb-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 text-xs font-bold transition";
+            document.getElementById('tab-teacher-responses').className = "pb-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 text-xs font-bold transition";
+
+            if (tabName === 'charts') {
+                document.getElementById('teacher-tab-charts').classList.remove('hidden');
+                document.getElementById('tab-teacher-charts').className = "pb-3 border-b-2 border-brand-600 text-brand-600 text-xs font-black transition";
+                setTimeout(renderCharts, 50); // Re-trigger canvas draw layout
+            } else if (tabName === 'excel') {
+                document.getElementById('teacher-tab-excel').classList.remove('hidden');
+                document.getElementById('tab-teacher-excel').className = "pb-3 border-b-2 border-brand-600 text-brand-600 text-xs font-black transition";
+                renderExcelTabContents();
+            } else if (tabName === 'responses') {
+                document.getElementById('teacher-tab-responses').classList.remove('hidden');
+                document.getElementById('tab-teacher-responses').className = "pb-3 border-b-2 border-brand-600 text-brand-600 text-xs font-black transition";
+                renderResponsesTabContents();
+            }
+        }
+
+        function renderTeacherMetrics() {
+            const responses = window.AppState.responses;
+            const stats = window.AppState.surveyStats;
+            const config = window.AppState.surveyConfig;
+
+            document.getElementById('metric-total-count').textContent = `${responses.length}명`;
+            document.getElementById('response-count-badge').textContent = `${responses.length}건의 데이터 수집됨`;
+
+            // Calculate Overall Aggregate mean
+            let grandSum = 0;
+            let grandCount = 0;
+            let textOpinionCount = 0;
+
+            responses.forEach(r => {
+                config.questions.forEach(q => {
+                    if (q.type === 'rating') {
+                        const val = parseInt(r.answers[q.id]);
+                        if (val && !isNaN(val)) {
+                            grandSum += val;
+                            grandCount++;
+                        }
+                    } else if (q.type === 'text') {
+                        const txt = r.answers[q.id];
+                        if (txt && txt.trim() !== '') {
+                            textOpinionCount++;
+                        }
+                    }
+                });
+            });
+
+            const overallAverage = grandCount > 0 ? (grandSum / grandCount).toFixed(2) : "0.00";
+            document.getElementById('metric-total-avg').textContent = `${overallAverage} / 5.0`;
+            document.getElementById('metric-feedback-count').textContent = `${textOpinionCount}건`;
+
+            // Identify best performance class
+            let topGroup = "-";
+            let topAvg = 0;
+
+            stats.uniqueClasses.forEach(cls => {
+                const data = stats.byClass[cls];
+                if (data && data.totalCount > 0) {
+                    const avg = data.totalSum / data.totalCount;
+                    if (avg > topAvg) {
+                        topAvg = avg;
+                        topGroup = cls;
+                    }
+                }
+            });
+
+            document.getElementById('metric-top-group').textContent = topGroup;
+            document.getElementById('metric-top-group').title = topGroup;
+        }
+
+        // Tab 2: 집단상담 통계표.xlsx Real-Time Preview Table (Q1 ~ Q7, J열 합계평균)
+        function renderExcelTabContents() {
+            const stats = window.AppState.surveyStats;
+            const config = window.AppState.surveyConfig;
+            
+            const tbody = document.getElementById('excel-table-body');
+            tbody.innerHTML = '';
+
+            // Grand Aggregate values
+            let totalParticipations = 0;
+            const totals = {};
+            config.questions.forEach(q => {
+                if (q.type === 'rating') {
+                    totals[q.id] = { sum: 0, count: 0 };
+                }
+            });
+
+            stats.uniqueClasses.forEach((cls, idx) => {
+                const item = stats.byClass[cls];
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50 transition";
+
+                // Accumulate counts
+                totalParticipations += item.count;
+
+                // Formulate values for q1 to q7
+                let clsOverallSum = 0;
+                let clsOverallCount = 0;
+
+                const colsMarkup = config.questions.filter(q => q.type === 'rating').map(q => {
+                    const ratingObj = item.ratings[q.id];
+                    const avgScore = ratingObj.count > 0 ? (ratingObj.sum / ratingObj.count).toFixed(2) : "-";
+                    
+                    if (ratingObj.count > 0) {
+                        totals[q.id].sum += ratingObj.sum;
+                        totals[q.id].count += ratingObj.count;
+                        clsOverallSum += ratingObj.sum;
+                        clsOverallCount += ratingObj.count;
+                    }
+
+                    return `<td class="p-3 border-r border-slate-200 text-center font-bold ${avgScore !== '-' && parseFloat(avgScore) >= 4.5 ? 'text-emerald-600 bg-emerald-50/10' : 'text-slate-600'}">${avgScore}</td>`;
+                }).join('');
+
+                const overallAvg = clsOverallCount > 0 ? (clsOverallSum / clsOverallCount).toFixed(2) : "-";
+
+                row.innerHTML = `
+                    <td class="p-3 border-r border-slate-200 text-center text-slate-400 font-mono">${idx + 2}</td>
+                    <td class="p-3 border-r border-slate-200 font-bold text-slate-800 text-[11px]">${cls}</td>
+                    <td class="p-3 border-r border-slate-200 text-center font-semibold text-slate-700">${item.count}명</td>
+                    ${colsMarkup}
+                    <td class="p-3 text-center font-black text-indigo-700 bg-indigo-50/30">${overallAvg}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Populate Footer Aggregate Row
+            let footerOverallSum = 0;
+            let footerOverallCount = 0;
+
+            const footerColsMarkup = config.questions.filter(q => q.type === 'rating').map(q => {
+                const totalObj = totals[q.id];
+                const avgScore = totalObj.count > 0 ? (totalObj.sum / totalObj.count).toFixed(2) : "0.00";
+                
+                if (totalObj.count > 0) {
+                    footerOverallSum += totalObj.sum;
+                    footerOverallCount += totalObj.count;
+                }
+
+                return `<td class="p-3 border-r border-slate-200 text-center text-emerald-700 font-black">${avgScore}</td>`;
+            }).join('');
+
+            const grandAverage = footerOverallCount > 0 ? (footerOverallSum / footerOverallCount).toFixed(2) : "0.00";
+
+            const footerRow = document.getElementById('excel-table-footer');
+            footerRow.innerHTML = `
+                <td class="p-3 border-r border-slate-200 text-center text-slate-400 font-mono">${stats.uniqueClasses.length + 2}</td>
+                <td class="p-3 border-r border-slate-200 text-slate-800 font-bold text-center">합계 및 전체 평균 (G)</td>
+                <td class="p-3 border-r border-slate-200 text-center font-black text-slate-900">${totalParticipations}명</td>
+                ${footerColsMarkup}
+                <td class="p-3 text-center text-indigo-800 bg-indigo-50/50 text-xs font-black">${grandAverage}</td>
+            `;
+        }
+
+        // Tab 3: Detailed Response List (Displaying writing date, school, grade/class, gender)
+        function renderResponsesTabContents() {
+            const responses = window.AppState.responses;
+            const config = window.AppState.surveyConfig;
+            const tbody = document.getElementById('student-responses-list-body');
+            tbody.innerHTML = '';
+
+            if (responses.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="14" class="p-8 text-center text-slate-400">
+                            <i class="fa-solid fa-hourglass-empty text-3xl mb-2 block"></i>
+                            <p class="text-xs">접수된 만족도 조사 응답 데이터가 존재하지 않습니다.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Sort responses: Newest first
+            const sorted = [...responses].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            sorted.forEach(r => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50 transition text-[11px]";
+
+                const qRatingsMarkup = config.questions.filter(q => q.type === 'rating').map(q => {
+                    const score = r.answers[q.id] || "-";
+                    return `<td class="p-2 text-center font-bold border-r border-slate-100 text-slate-700">${score}</td>`;
+                }).join('');
+
+                const q8Comment = r.answers['q8'] || "-";
+                const dateStr = r.timestamp ? new Date(r.timestamp).toLocaleDateString() : "-";
+                const writeDate = r.date || "-";
+                const school = r.school || "-";
+                const gradeClass = r.gradeClass || "-";
+                const gender = r.gender || "-";
+
+                row.innerHTML = `
+                    <td class="p-3 font-semibold text-slate-800 border-r border-slate-100">${writeDate}</td>
+                    <td class="p-3 text-slate-600 border-r border-slate-100">${school}</td>
+                    <td class="p-3 text-slate-600 border-r border-slate-100 font-bold">${gradeClass}</td>
+                    <td class="p-3 text-center text-slate-600 border-r border-slate-100">${gender}</td>
+                    ${qRatingsMarkup}
+                    <td class="p-3 border-r border-slate-100 text-slate-600 font-medium max-w-[200px] truncate hover:text-slate-900 hover:whitespace-normal transition-all" title="${q8Comment}">${q8Comment}</td>
+                    <td class="p-3 text-center text-slate-400 border-r border-slate-100 text-[10px]">${dateStr}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="deleteResponse('${r.id}')" class="text-rose-500 hover:text-rose-700 p-1.5 hover:bg-rose-50 rounded-lg transition" title="삭제">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Draw analytical dashboard charts
+        function renderCharts() {
+            if (window.AppState.role !== 'teacher') return;
+
+            const stats = window.AppState.surveyStats;
+            const config = window.AppState.surveyConfig;
+
+            // Chart 1: Radar Chart for questions/metrics (Q1 ~ Q7)
+            const radarCanvas = document.getElementById('chart-metrics-radar');
+            if (radarCanvas) {
+                const labels = [];
+                const dataValues = [];
+
+                config.questions.filter(q => q.type === 'rating').forEach(q => {
+                    labels.push(q.category);
+                    const metricData = stats.byMetric[q.id];
+                    const avg = metricData.count > 0 ? (metricData.sum / metricData.count) : 0;
+                    dataValues.push(parseFloat(avg.toFixed(2)));
+                });
+
+                if (radarChartInstance) radarChartInstance.destroy();
+
+                radarChartInstance = new Chart(radarCanvas, {
+                    type: 'radar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '지표 만족도 평균 (5점 기준)',
+                            data: dataValues,
+                            backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                            borderColor: 'rgb(99, 102, 241)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgb(99, 102, 241)',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(99, 102, 241)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            r: {
+                                min: 0,
+                                max: 5,
+                                ticks: { stepSize: 1, showLabelBackdrop: false },
+                                pointLabels: { font: { size: 10, weight: 'bold' } }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Chart 2: Bar Chart comparing Counseling Classes
+            const barCanvas = document.getElementById('chart-groups-bar');
+            if (barCanvas) {
+                const labels = [];
+                const dataValues = [];
+
+                stats.uniqueClasses.forEach(cls => {
+                    labels.push(cls);
+                    const classStats = stats.byClass[cls];
+                    const avg = classStats.totalCount > 0 ? (classStats.totalSum / classStats.totalCount) : 0;
+                    dataValues.push(parseFloat(avg.toFixed(2)));
+                });
+
+                if (barChartInstance) barChartInstance.destroy();
+
+                barChartInstance = new Chart(barCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: dataValues,
+                            backgroundColor: 'rgba(22, 163, 74, 0.7)',
+                            borderRadius: 6,
+                            borderWidth: 0,
+                            barThickness: 24
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                min: 0,
+                                max: 5,
+                                ticks: { stepSize: 1 }
+                            },
+                            x: {
+                                ticks: { font: { size: 9, weight: 'bold' } }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Form Submission Handler
+        function handleSurveySubmit(event) {
+            event.preventDefault();
+
+            const date = document.getElementById('survey-date').value;
+            const school = document.getElementById('survey-school').value.trim();
+            const gradeClass = document.getElementById('survey-grade-class').value.trim();
+            
+            // Get checked gender radio
+            const genders = document.getElementsByName('survey-gender');
+            let gender = "";
+            for (let g of genders) {
+                if (g.checked) {
+                    gender = g.value;
+                    break;
+                }
+            }
+
+            if (!date || !school || !gradeClass || !gender) {
+                showNotification("작성일, 학교명, 학년반 및 성별을 모두 올바르게 입력해 주세요.", "error");
+                return;
+            }
+
+            const config = window.AppState.surveyConfig;
+            const answers = {};
+
+            let missingRating = false;
+            config.questions.forEach(q => {
+                if (q.type === 'rating') {
+                    const radios = document.getElementsByName(`q_${q.id}`);
+                    let selectedVal = null;
+                    for (let r of radios) {
+                        if (r.checked) {
+                            selectedVal = parseInt(r.value);
+                            break;
+                        }
+                    }
+                    if (selectedVal === null) {
+                        missingRating = true;
+                    }
+                    answers[q.id] = selectedVal;
+                } else if (q.type === 'text') {
+                    const val = document.getElementById(`text_input_${q.id}`).value.trim();
+                    answers[q.id] = val;
+                }
+            });
+
+            if (missingRating) {
+                showNotification("정량 평가 질문 항목(Q1~Q7)을 모두 선택해 주세요.", "error");
+                return;
+            }
+
+            const responseObj = {
+                id: 'resp-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+                date,
+                school,
+                gradeClass,
+                gender,
+                answers,
+                timestamp: new Date().toISOString()
+            };
+
+            // Trigger Save Promise
+            window.saveSurveyResponse(responseObj);
+            
+            // Completion confirmation alert UI
+            showModalConfirm(
+                "설문 제출 완료",
+                "만족도 설문조사가 성공적으로 제출되었습니다. 참여해 주셔서 감사합니다!",
+                "green",
+                "확인",
+                () => {
+                    resetSurveyForm();
+                }
+            );
+        }
+
+        function resetSurveyForm() {
+            document.getElementById('student-survey-form').reset();
+            const config = window.AppState.surveyConfig;
+            config.questions.forEach(q => {
+                if (q.type === 'text') {
+                    document.getElementById(`text_input_${q.id}`).value = "";
+                }
+            });
+            // Re-apply current date
+            const dateInput = document.getElementById('survey-date');
+            if (dateInput) {
+                dateInput.value = new Date().toISOString().split('T')[0];
+            }
+            showNotification("설문 입력 양식이 초기화되었습니다.", "info");
+        }
+
+        // Delete Response Pipeline
+        function deleteResponse(docId) {
+            showModalConfirm(
+                "정말로 삭제하시겠습니까?",
+                "삭제 시 '집단상담 통계표.xlsx'의 통계 데이터도 즉시 재연산되어 변경됩니다.",
+                "red",
+                "영구 삭제",
+                () => {
+                    window.deleteSurveyResponse(docId);
+                }
+            );
+        }
+
+        function confirmClearAllResponses() {
+            showModalConfirm(
+                "전체 데이터를 초기화하시겠습니까?",
+                "누적된 모든 학생들의 응답 데이터가 삭제되고 통계 표 및 차트가 초기 상태로 리셋됩니다.",
+                "red",
+                "완전 초기화",
+                () => {
+                    window.clearAllDatabaseResponses();
+                }
+            );
+        }
+
+        // CSV Export Function
+        function exportToCSV() {
+            const stats = window.AppState.surveyStats;
+            const config = window.AppState.surveyConfig;
+            
+            // Generate standard CSV string with appropriate formatting
+            let csvContent = "\uFEFF"; // UTF-8 BOM representation for correct Korean encoding in Excel
+            
+            // Header for CSV
+            csvContent += "구분 번호,학년/반 구분,참여 인원,Q1(도움),Q2(자신감),Q3(감정공감),Q4(일상회복),Q5(성찰),Q6(관계개선),Q7(추천),종합 만족도 평균\n";
+
+            // Rows
+            let totalParticipations = 0;
+            const totals = {};
+            config.questions.forEach(q => {
+                if (q.type === 'rating') totals[q.id] = { sum: 0, count: 0 };
+            });
+
+            stats.uniqueClasses.forEach((cls, idx) => {
+                const item = stats.byClass[cls];
+                totalParticipations += item.count;
+
+                let clsOverallSum = 0;
+                let clsOverallCount = 0;
+
+                const scoreArr = config.questions.filter(q => q.type === 'rating').map(q => {
+                    const ratingObj = item.ratings[q.id];
+                    const avgScore = ratingObj.count > 0 ? (ratingObj.sum / ratingObj.count).toFixed(2) : 0;
+                    
+                    if (ratingObj.count > 0) {
+                        totals[q.id].sum += ratingObj.sum;
+                        totals[q.id].count += ratingObj.count;
+                        clsOverallSum += ratingObj.sum;
+                        clsOverallCount += ratingObj.count;
+                    }
+                    return avgScore;
+                });
+
+                const overallAvg = clsOverallCount > 0 ? (clsOverallSum / clsOverallCount).toFixed(2) : 0;
+
+                csvContent += `${idx + 1},"${cls}",${item.count},${scoreArr.join(',')},${overallAvg}\n`;
+            });
+
+            // Summary Totals
+            let footerOverallSum = 0;
+            let footerOverallCount = 0;
+            const footerScoreArr = config.questions.filter(q => q.type === 'rating').map(q => {
+                const totalObj = totals[q.id];
+                const avgScore = totalObj.count > 0 ? (totalObj.sum / totalObj.count).toFixed(2) : 0;
+                
+                if (totalObj.count > 0) {
+                    footerOverallSum += totalObj.sum;
+                    footerOverallCount += totalObj.count;
+                }
+                return avgScore;
+            });
+
+            const grandAverage = footerOverallCount > 0 ? (footerOverallSum / footerOverallCount).toFixed(2) : 0;
+            csvContent += `합계,전체 합산 평균,${totalParticipations},${footerScoreArr.join(',')},${grandAverage}\n\n`;
+
+            // Append detailed text opinions as additional block inside Excel
+            csvContent += "=== 주관식 소감 및 기타의견 목록 ===\n";
+            csvContent += "작성일,학교명,학년반,성별,Q8. 기타의견\n";
+            window.AppState.responses.forEach(r => {
+                const q8Comment = r.answers['q8'] || "";
+                if (q8Comment && q8Comment.trim() !== '') {
+                    csvContent += `"${r.date || ''}","${r.school || ''}","${r.gradeClass || ''}","${r.gender || ''}","${q8Comment.replace(/"/g, '""')}"\n`;
+                }
+            });
+
+            // Trigger download safely
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", "집단상담 통계표.csv");
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showNotification("집단상담 통계표.csv 파일이 정상적으로 다운로드되었습니다.", "success");
+            }
+        }
+
+        // Clipboard Share Link Simulation
+        function copySurveyLink() {
+            const virtualUrl = window.location.origin + window.location.pathname + "?mode=student";
+            
+            // Safe fallback method for iFrame environment
+            const tempInput = document.createElement("input");
+            tempInput.value = virtualUrl;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            showNotification("학생 배포용 단축 설문참여 주소가 클립보드에 복사되었습니다!", "success");
+        }
+
+        // Populating high fidelity testing data instantly for the 7 questions
+        function generateMockResponses() {
+            const schools = ["가람중학교", "정원고등학교", "누리초등학교"];
+            const classes = ["1학년 1반", "1학년 2반", "1학년 3반", "2학년 1반", "2학년 2반", "3학년 1반", "3학년 2반"];
+            const genders = ["남", "여"];
+            const commentsQ8 = [
+                "매우 만족스러운 경험이었습니다. 위클래스 상담실 환경이 정말 아늑했어요.",
+                "대화의 진실한 가치와 친구들의 생각을 공감할 수 있어서 든든했습니다.",
+                "마음속의 스트레스와 답답함이 다소 해소되는 유익한 시간이었습니다.",
+                "생각 표현법과 대화 제어법을 정교하게 다룬 유용한 솔루션입니다.",
+                "불안하고 어두웠던 기분이 많이 긍정적으로 반전되었습니다.",
+                "학기마다 무조건 고정 개설되었으면 좋겠습니다. 적극 추천합니다."
+            ];
+
+            const newlyCreated = [];
+            for (let i = 0; i < 15; i++) {
+                const randomSchool = schools[Math.floor(Math.random() * schools.length)];
+                const randomClass = classes[Math.floor(Math.random() * classes.length)];
+                const randomGender = genders[Math.floor(Math.random() * genders.length)];
+                
+                const answers = {};
+                // ratings q1 to q7
+                for (let q = 1; q <= 7; q++) {
+                    // bias towards positive feedback (4 or 5 standard, occasional 3)
+                    const rand = Math.random();
+                    answers[`q${q}`] = rand > 0.45 ? 5 : (rand > 0.15 ? 4 : 3);
+                }
+                // comment q8
+                answers['q8'] = Math.random() > 0.3 ? commentsQ8[Math.floor(Math.random() * commentsQ8.length)] : "";
+
+                newlyCreated.push({
+                    id: 'mock-gen-' + i + '-' + Date.now(),
+                    date: "2026-06-02",
+                    school: randomSchool,
+                    gradeClass: randomClass,
+                    gender: randomGender,
+                    answers: answers,
+                    timestamp: new Date(Date.now() - (Math.random() * 86400000)).toISOString()
+                });
+            }
+
+            if (window.AppState.isOnline && window.AppState.db) {
+                newlyCreated.forEach(async (item) => {
+                    const responsesColRef = collection(window.AppState.db, 'artifacts', window.AppState.appId, 'public', 'data', 'responses');
+                    await addDoc(responsesColRef, item);
+                });
+                showNotification("15명의 실시간 가상 응답 데이터셋을 데이터베이스로 송출했습니다.", "success");
+            } else {
+                window.AppState.responses = [...window.AppState.responses, ...newlyCreated];
+                localStorage.setItem('local_survey_responses_v3', JSON.stringify(window.AppState.responses));
+                calculateStatistics();
+                renderApp();
+                showNotification("15명의 로컬 테스트 셋이 브라우저에 마운트 되었습니다.", "success");
+            }
+        }
+
+        // Mock xlsx modal view render triggers (C ~ I columns dynamically assigned)
+        function triggerExcelMockView() {
+            document.getElementById('mock-excel-modal').classList.remove('hidden');
+            
+            // Build temporary stats rendering inside the mockup Excel screen to emulate active cells
+            const stats = window.AppState.surveyStats;
+            const config = window.AppState.surveyConfig;
+            const tbody = document.getElementById('mock-excel-table-body');
+            tbody.innerHTML = '';
+
+            stats.uniqueClasses.forEach((cls, idx) => {
+                const item = stats.byClass[cls];
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50 text-[11px]";
+
+                let clsOverallSum = 0;
+                let clsOverallCount = 0;
+
+                const colsMarkup = config.questions.filter(q => q.type === 'rating').map((q, cIdx) => {
+                    const ratingObj = item.ratings[q.id];
+                    const avgScore = ratingObj.count > 0 ? (ratingObj.sum / ratingObj.count).toFixed(2) : "-";
+                    
+                    if (ratingObj.count > 0) {
+                        clsOverallSum += ratingObj.sum;
+                        clsOverallCount += ratingObj.count;
+                    }
+
+                    // Show virtual Excel column cell like (C2, D2, E2...)
+                    const cellLetter = String.fromCharCode(67 + cIdx); // C, D, E, F, G, H, I...
+                    const rowNum = idx + 2;
+
+                    return `
+                        <td class="p-2 border-r border-slate-200 text-center font-mono">
+                            <span class="block text-slate-800 font-bold">${avgScore}</span>
+                            <span class="text-[9px] text-slate-400 font-normal">${cellLetter}${rowNum}</span>
+                        </td>
+                    `;
+                }).join('');
+
+                const overallAvg = clsOverallCount > 0 ? (clsOverallSum / clsOverallCount).toFixed(2) : "-";
+                const grandCellLetter = String.fromCharCode(67 + config.questions.filter(q => q.type === 'rating').length); // J
+                const rowNum = idx + 2;
+
+                row.innerHTML = `
+                    <td class="p-2 border-r border-slate-200 text-center text-slate-400 font-mono font-bold">${idx + 2}</td>
+                    <td class="p-2 border-r border-slate-200 font-semibold text-slate-800 text-[10px]">${cls}</td>
+                    <td class="p-2 border-r border-slate-200 text-center font-mono">
+                        <span class="block text-slate-700 font-semibold">${item.count}</span>
+                        <span class="text-[9px] text-slate-400">B${idx + 2}</span>
+                    </td>
+                    ${colsMarkup}
+                    <td class="p-2 text-center font-mono font-bold bg-emerald-50 text-emerald-900">
+                        <span class="block">${overallAvg}</span>
+                        <span class="text-[9px] text-emerald-500 font-normal">${grandCellLetter}${rowNum}</span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function closeExcelMockView() {
+            document.getElementById('mock-excel-modal').classList.add('hidden');
+        }
+
+        // Notification center system toast handler
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let bgClass = "bg-slate-800 text-white";
+            let icon = '<i class="fa-solid fa-circle-info mr-2 text-slate-300"></i>';
+
+            if (type === 'success') {
+                bgClass = "bg-emerald-600 text-white shadow-emerald-100";
+                icon = '<i class="fa-solid fa-check-circle mr-2 text-emerald-200"></i>';
+            } else if (type === 'error') {
+                bgClass = "bg-rose-600 text-white shadow-rose-100";
+                icon = '<i class="fa-solid fa-circle-exclamation mr-2 text-rose-200"></i>';
+            } else if (type === 'warning') {
+                bgClass = "bg-amber-500 text-slate-900 shadow-amber-100";
+                icon = '<i class="fa-solid fa-triangle-exclamation mr-2 text-slate-800"></i>';
+            }
+
+            toast.className = `${bgClass} px-4 py-3 rounded-xl text-xs font-semibold shadow-lg flex items-center transition duration-300 transform translate-y-2 opacity-0 pointer-events-auto`;
+            toast.innerHTML = icon + `<span>${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            // Animation trigger
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            // Exit animation
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-x-4');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Custom Confirm Dialog Modals
+        let confirmPromiseResolver = null;
+        function showModalConfirm(title, message, themeColor = 'blue', actionText = '확인', callback = null) {
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-message').textContent = message;
+            
+            const iconBg = document.getElementById('confirm-icon-bg');
+            const icon = document.getElementById('confirm-icon');
+            const btn = document.getElementById('confirm-ok-btn');
+
+            if (themeColor === 'red') {
+                iconBg.className = "w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center text-xl mx-auto mb-3";
+                icon.className = "fa-solid fa-circle-exclamation";
+                btn.className = "flex-1 bg-rose-600 hover:bg-rose-700 text-white py-2.5 rounded-xl text-xs font-bold shadow-md shadow-rose-100 transition";
+            } else if (themeColor === 'green') {
+                iconBg.className = "w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-xl mx-auto mb-3";
+                icon.className = "fa-solid fa-circle-check";
+                btn.className = "flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-xs font-bold shadow-md shadow-emerald-100 transition";
+            } else {
+                iconBg.className = "w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-xl mx-auto mb-3";
+                icon.className = "fa-solid fa-circle-info";
+                btn.className = "flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-xs font-bold shadow-md shadow-blue-100 transition";
+            }
+
+            btn.textContent = actionText;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+
+            confirmPromiseResolver = callback;
+        }
+
+        function closeConfirmModal(accepted) {
+            document.getElementById('confirm-modal').classList.add('hidden');
+            if (accepted && confirmPromiseResolver) {
+                confirmPromiseResolver();
+            }
+            confirmPromiseResolver = null;
+        }
+    </script>
 </body>
 </html>
